@@ -19,7 +19,28 @@ module PixPayload
       payload += emv("60", cidade[0..14])
       payload += emv("62", emv("05", txid))
 
-      payload
+      payload += "6304"
+      crc = crc16(payload)
+      payload + crc
+    end
+
+    def self.crc16(texto)
+      resultado = 0xFFFF
+
+      texto.each_byte do |caractere|
+        resultado ^= (caractere << 8)
+
+        8.times do
+          if resultado & 0x8000 != 0
+            resultado = (resultado << 1) ^ 0x1021
+          else
+            resultado <<= 1
+          end
+
+          resultado &= 0xFFFF
+        end
+      end
+      resultado.to_s(16).upcase.rjust(4, "0")
     end
 
     def self.emv(id, value)
