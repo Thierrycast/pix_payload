@@ -12,7 +12,8 @@ Suporte completo a chave Pix, valor, nome, cidade, TxID e descrição.
 🛠️ Modificação do valor em payloads existentes  
 🔍 Análise e extração dos dados de um payload  
 🔢 Cálculo automático do CRC16 (padrão CCITT-FALSE)  
-📦 Pronto para ser convertido em QR Code  
+📦 Pronto para ser convertido em QR Code 
+💻 CLI interativo 
 
 ---
 
@@ -31,6 +32,39 @@ git clone https://github.com/Thierrycast/pix_payload.git
 cd pix_payload
 bundle install
 ```
+
+## 📦 Uso via CLI
+
+```bash
+./bin/pix_payload generate --chave thierry@pix.com --nome "Thierry Castro" --cidade "SAO PAULO" --valor 42.5
+````
+
+Se você omitir campos obrigatórios, um modo **interativo** será ativado automaticamente:
+
+```bash
+./bin/pix_payload generate
+# Informe a chave PIX:
+# Informe o nome do recebedor:
+# ...
+```
+
+### 🔎 Parse
+
+```bash
+./bin/pix_payload parse --payload "000201..."
+# ou
+./bin/pix_payload parse --payload "000201..." --raw
+```
+
+### ✏️ Modify
+
+```bash
+./bin/pix_payload modify --payload "000201..." --valor 99.99 --descricao "nova"
+# ou, modo interativo (se campos não forem informados via CLI):
+./bin/pix_payload modify
+```
+
+> ⚠️ Atenção sobre argumentos com espaços: use sempre **aspas** no `--payload`
 
 ---
 
@@ -135,17 +169,6 @@ Você pode explorar mais IDs no [Manual do BR Code - BACEN (PDF)](https://www.bc
 
 ---
 
-## 🛠️ Futuro CLI (em construção)
-
-Em breve, use via terminal:
-
-```bash
-pix_payload gerar --chave ... --valor 10 --nome ... --cidade ...
-pix_payload parse --payload "000201..."
-pix_payload alterar --payload "000201..." --valor 50
-```
-
----
 
 ## ✅ Conformidade
 
