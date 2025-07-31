@@ -33,41 +33,6 @@ cd pix_payload
 bundle install
 ```
 
-## 📦 Uso via CLI
-
-```bash
-./bin/pix_payload generate --chave thierry@pix.com --nome "Thierry Castro" --cidade "SAO PAULO" --valor 42.5
-````
-
-Se você omitir campos obrigatórios, um modo **interativo** será ativado automaticamente:
-
-```bash
-./bin/pix_payload generate
-# Informe a chave PIX:
-# Informe o nome do recebedor:
-# ...
-```
-
-### 🔎 Parse
-
-```bash
-./bin/pix_payload parse --payload "000201..."
-# ou
-./bin/pix_payload parse --payload "000201..." --raw
-```
-
-### ✏️ Modify
-
-```bash
-./bin/pix_payload modify --payload "000201..." --valor 99.99 --descricao "nova"
-# ou, modo interativo (se campos não forem informados via CLI):
-./bin/pix_payload modify
-```
-
-> ⚠️ Atenção sobre argumentos com espaços: use sempre **aspas** no `--payload`
-
----
-
 ## 📚 Módulos disponíveis
 
 | Módulo                 | Função                                                   |
@@ -143,6 +108,40 @@ puts dados
 | `descricao:` | `String` | ❌          | Descrição da cobrança (máx. 72 caracteres)                      |
 
 ---
+## 📦 Uso via CLI
+
+```bash
+./bin/pix_payload generate --chave thierry@pix.com --nome "Thierry Castro" --cidade "SAO PAULO" --valor 42.5
+````
+
+Se você omitir campos obrigatórios, um modo **interativo** será ativado automaticamente:
+
+```bash
+./bin/pix_payload generate
+# Informe a chave PIX:
+# Informe o nome do recebedor:
+# ...
+```
+
+### 🔎 Parse
+
+```bash
+./bin/pix_payload parse --payload "000201..."
+# ou
+./bin/pix_payload parse --payload "000201..." --raw
+```
+
+### ✏️ Modify
+
+```bash
+./bin/pix_payload modify --payload "000201..." --valor 99.99 --descricao "nova"
+# ou, modo interativo (se campos não forem informados via CLI):
+./bin/pix_payload modify
+```
+
+> ⚠️ Atenção sobre argumentos com espaços: use **aspas** no `--payload`
+
+---
 
 ## 💡 Curiosidade técnica
 
@@ -173,8 +172,6 @@ Você pode explorar mais IDs no [Manual do BR Code - BACEN (PDF)](https://www.bc
 ## ✅ Conformidade
 
 Este projeto segue a especificação oficial do Banco Central do Brasil (EMVCo).
-
-📄 [Manual do Padrão BR Code - BACEN (PDF)](https://www.bcb.gov.br/content/estabilidadefinanceira/spb_docs/ManualBRCode.pdf)
 
 ---
 
