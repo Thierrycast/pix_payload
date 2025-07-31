@@ -18,7 +18,7 @@ when "--help", "-h", nil
 
     Comandos disponíveis:
       generate    Gera um código Copia e Cola
-      parse       Interpreta um código Copia e Cola
+      parse       Interpreta um código Copia e Cola (use --raw para estrutura bruta)
       modify      Altera valores de um código existente
 
     Use 'pix_payload <comando> --help' para ver as opções de cada comando.

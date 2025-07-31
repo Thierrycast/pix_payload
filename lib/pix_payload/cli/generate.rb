@@ -1,5 +1,36 @@
 require_relative "../generator"
 
+def solicitar_obrigatorio(label, max = nil)
+  loop do
+    print "#{label}#{max ? " (máx #{max} caracteres)" : ""}: "
+    entrada = gets.strip
+    if entrada.empty?
+      puts "⚠️ Campo obrigatório. Tente novamente."
+    elsif max && entrada.length > max
+      puts "⚠️ Limite de #{max} caracteres excedido. Tente novamente."
+    else
+      return entrada
+    end
+  end
+end
+
+def solicitar_opcional(label, tipo: :string)
+  print "#{label} (pressione ENTER para ignorar): "
+  entrada = gets.strip
+  return nil if entrada.empty?
+
+  if tipo == :float
+    begin
+      Float(entrada)
+    rescue ArgumentError
+      puts "⚠️ Valor inválido. Deve ser um número (ex: 42.5)."
+      solicitar_opcional(label, tipo: :float)
+    end
+  else
+    entrada
+  end
+end
+
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Uso: pix_payload generate [opções]"
@@ -16,10 +47,13 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-unless options[:chave] && options[:nome] && options[:cidade]
-  puts "Erro: faltam argumentos obrigatórios. Use --help para ver as opções."
-  exit 1
-end
+options[:chave]  ||= solicitar_obrigatorio("Informe a chave PIX")
+options[:nome]   ||= solicitar_obrigatorio("Informe o nome do recebedor", 25)
+options[:cidade] ||= solicitar_obrigatorio("Informe a cidade", 15)
+
+options[:valor] ||= solicitar_opcional("Informe o valor (ex: 42.5)", tipo: :float)
+options[:txid] ||= solicitar_opcional("Informe o TxID")
+options[:descricao] ||= solicitar_opcional("Informe a descrição")
 
 puts PixPayload::Generator.generate_payload(
   chave: options[:chave],
