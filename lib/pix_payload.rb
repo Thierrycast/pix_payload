@@ -3,6 +3,10 @@
 require_relative "pix_payload/version"
 
 module PixPayload
-  class Error < StandardError; end
-  # Your code goes here...
+  class Generator
+    def self.emv(id, value)
+      length = value.length.to_s.rjust(2, '0')
+      "#{id}#{length}#{value}"
+    end
+  end
 end
