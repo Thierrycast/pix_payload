@@ -1,43 +1,109 @@
-# PixPayload
+# pix_payload
 
-TODO: Delete this and the text below, and describe your gem
+Gem Ruby para gerar payloads do tipo **PIX Copia e Cola**, seguindo o padrão do Banco Central do Brasil (EMVCo).  
+Permite personalizar a chave PIX, valor, nome do recebedor, cidade e identificador da transação (TxID).  
+Retorna uma string válida com o campo CRC16 já calculado.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pix_payload`. To experiment with that code, run `bin/console` for an interactive prompt.
+---
 
-## Installation
+## ✨ Funcionalidades
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+- Geração completa do payload PIX com suporte a:
+  - Chave PIX (e-mail, CPF, telefone, chave aleatória, etc)
+  - Valor (opcional)
+  - Nome e cidade do recebedor
+  - Identificador da transação (TxID)
+- Cálculo automático do CRC16 (padrão CCITT-FALSE)
+- Pronto para ser convertido em QR Code
 
-Install the gem and add to the application's Gemfile by executing:
+---
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+## 💎 Instalação
+
+Adicione ao seu `Gemfile`:
+
+```ruby
+gem "pix_payload", github: "Thierrycast/pix_payload"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Ou instale diretamente:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+git clone https://github.com/Thierrycast/pix_payload.git
+cd pix_payload
+bundle install
 ```
 
-## Usage
+---
 
-TODO: Write usage instructions here
+## 🧪 Exemplo de uso
 
-## Development
+```ruby
+require "pix_payload"
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+payload = PixPayload::Generator.generate_payload(
+  chave: "thierry@email.com",
+  nome: "Thierry Castro",
+  cidade: "Sardoa",
+  valor: 42.50,
+  txid: "REF123"
+)
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+puts payload
+# => retorna uma string longa do tipo Copia e Cola (com campo 63 incluso)
+```
 
-## Contributing
+---
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pix_payload. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/pix_payload/blob/main/CODE_OF_CONDUCT.md).
+## 📥 Parâmetros esperados
 
-## License
+| Parâmetro | Tipo     | Obrigatório | Detalhes                                                                 |
+|-----------|----------|-------------|--------------------------------------------------------------------------|
+| `chave:`  | `String` | ✅          | Chave PIX (e-mail, CPF, aleatória, etc)                                  |
+| `nome:`   | `String` | ✅          | **Nome cadastrado na instituição financeira da chave** (máx. 25 chars)   |
+| `cidade:` | `String` | ✅          | Cidade do recebedor (máx. 15 chars)¹                                     |
+| `valor:`  | `Float`  | ❌          | Valor da transação (omitido se não informado)                            |
+| `txid:`   | `String` | ❌          | Identificador da transação (padrão: `"***"`)                             |
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
-## Code of Conduct
+---
 
-Everyone interacting in the PixPayload project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pix_payload/blob/main/CODE_OF_CONDUCT.md).
+## 📤 Saída
+
+Retorna uma `String` no padrão PIX Copia e Cola, já com o campo `6304XXXX` (CRC) calculado no final.
+
+Você pode usar essa string:
+- Como QR Code (com bibliotecas como `rqrcode`)
+- Copiar e colar diretamente em apps bancários
+
+---
+
+## 🔧 Exemplo prático (via IRB)
+
+```bash
+$ bin/console
+```
+
+```ruby
+PixPayload::Generator.generate_payload(
+  chave: "email@pix.com",
+  nome: "Loja Exemplo",
+  cidade: "SAO PAULO",
+  valor: 99.90,
+  txid: "pedido123"
+)
+```
+
+---
+
+## ✅ Conformidade
+
+Este projeto segue o padrão **EMVCo** adotado pelo Banco Central do Brasil.
+Referência: [Manual do Padrão BR Code - BACEN (PDF)](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/Regulamento_Pix_ManualdePadroesparaIniciacaodoPix.pdf)
+
+---
+
+
+## 📄 Licença
+
+MIT
