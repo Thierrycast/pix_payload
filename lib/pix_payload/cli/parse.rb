@@ -1,3 +1,4 @@
+require "json"
 require_relative "../parser"
 
 options = {}
@@ -12,8 +13,12 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:payload]
+  if options[:payload] && !options[:payload].include?("6304")
+    warn "⚠️ Payload parece incompleto. Use aspas para argumentos com espaços."
+    exit 1
+  end
   result = PixPayload::Parser.parse_payload(options[:payload])
-  require "json"
+  puts "Aviso: nenhum dado foi extraído do payload." if result.empty?
   puts JSON.pretty_generate(result)
 else
   puts "Erro: informe --payload"

@@ -1,4 +1,5 @@
 require_relative "../modifier"
+require_relative "../parser"
 
 options = {}
 OptionParser.new do |opts|
@@ -18,11 +19,16 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:payload]
+  if options[:payload] && !options[:payload].include?("6304")
+    warn "⚠️ Payload parece incompleto. Use aspas para argumentos com espaços."
+    exit 1
+  end
+
   novo_payload = PixPayload::Modifier.alterar(options.delete(:payload), options)
   if novo_payload
     puts novo_payload
   else
-    puts "Erro: payload inválido ou não pôde ser modificado"
+    puts "Erro: payload inválido ou os dados originais não puderam ser lidos."
     exit 1
   end
 else
