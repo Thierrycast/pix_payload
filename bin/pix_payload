@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+
+subcommand = ARGV.shift
+
+case subcommand
+when "generate"
+  require_relative "../lib/pix_payload/cli/generate"
+when "parse"
+  require_relative "../lib/pix_payload/cli/parse"
+when "modify"
+  require_relative "../lib/pix_payload/cli/modify"
+when "--help", "-h", nil
+  puts <<~HELP
+    Uso: pix_payload <comando> [opções]
+
+    Comandos disponíveis:
+      generate    Gera um código Copia e Cola
+      parse       Interpreta um código Copia e Cola
+      modify      Altera valores de um código existente
+
+    Use 'pix_payload <comando> --help' para ver as opções de cada comando.
+  HELP
+else
+  puts "Comando desconhecido: #{subcommand}"
+  exit 1
+end
