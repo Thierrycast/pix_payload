@@ -1,24 +1,22 @@
-# pix_payload
+# 💸 pix_payload
 
-Gem Ruby para gerar payloads do tipo **PIX Copia e Cola**, seguindo o padrão do Banco Central do Brasil (EMVCo).  
-Permite personalizar a chave PIX, valor, nome do recebedor, cidade e identificador da transação (TxID).  
-Retorna uma string válida com o campo CRC16 já calculado.
+**Gem Ruby** para geração, modificação e análise de payloads do tipo **PIX Copia e Cola**, seguindo o padrão oficial do Banco Central do Brasil (EMVCo).
+
+Suporte completo a chave Pix, valor, nome, cidade, TxID e descrição.  
 
 ---
 
 ## ✨ Funcionalidades
 
-- Geração completa do payload PIX com suporte a:
-  - Chave PIX (e-mail, CPF, telefone, chave aleatória, etc)
-  - Valor (opcional)
-  - Nome e cidade do recebedor
-  - Identificador da transação (TxID)
-- Cálculo automático do CRC16 (padrão CCITT-FALSE)
-- Pronto para ser convertido em QR Code
+✅ Geração completa do payload PIX  
+🛠️ Modificação do valor em payloads existentes  
+🔍 Análise e extração dos dados de um payload  
+🔢 Cálculo automático do CRC16 (padrão CCITT-FALSE)  
+📦 Pronto para ser convertido em QR Code  
 
 ---
 
-## 💎 Instalação
+## 🚀 Instalação
 
 Adicione ao seu `Gemfile`:
 
@@ -26,7 +24,7 @@ Adicione ao seu `Gemfile`:
 gem "pix_payload", github: "Thierrycast/pix_payload"
 ```
 
-Ou instale diretamente:
+Ou instale manualmente:
 
 ```bash
 git clone https://github.com/Thierrycast/pix_payload.git
@@ -36,73 +34,126 @@ bundle install
 
 ---
 
-## 🧪 Exemplo de uso
+## 📚 Módulos disponíveis
+
+| Módulo                 | Função                                                   |
+|------------------------|----------------------------------------------------------|
+| `PixPayload::Generator` | Gera payloads completos a partir de parâmetros          |
+| `PixPayload::Modifier`  | Altera campos de um payload existente (ex: valor)       |
+| `PixPayload::Parser`    | Lê um payload e extrai seus dados de forma estruturada  |
+
+> **⚠️ Atenção sobre o campo `nome`:**  
+> Algumas instituições financeiras validam o nome do recebedor exatamente como consta no banco de destino.  
+> Se o nome estiver incorreto ou divergente, o pagamento pode ser recusado.  
+> Isso vale tanto ao gerar quanto ao modificar um payload.
+
+---
+
+## 🧪 Exemplos
+
+### 📦 Gerar um payload completo
 
 ```ruby
 require "pix_payload"
 
 payload = PixPayload::Generator.generate_payload(
-  chave: "thierry@email.com",
+  chave: "chave-pix@exemplo.com",
   nome: "Thierry Castro",
-  cidade: "Sardoa",
+  cidade: "SAO PAULO",
   valor: 42.50,
-  txid: "REF123"
+  txid: "abc123",
+  descricao: "Pagamento pelo serviço"
 )
 
 puts payload
-# => retorna uma string longa do tipo Copia e Cola (com campo 63 incluso)
 ```
 
 ---
 
-## 📥 Parâmetros esperados
-
-| Parâmetro | Tipo     | Obrigatório | Detalhes                                                                 |
-|-----------|----------|-------------|--------------------------------------------------------------------------|
-| `chave:`  | `String` | ✅          | Chave PIX (e-mail, CPF, aleatória, etc)                                  |
-| `nome:`   | `String` | ✅          | **Nome cadastrado na instituição financeira da chave** (máx. 25 chars)   |
-| `cidade:` | `String` | ✅          | Cidade do recebedor (máx. 15 chars)¹                                     |
-| `valor:`  | `Float`  | ❌          | Valor da transação (omitido se não informado)                            |
-| `txid:`   | `String` | ❌          | Identificador da transação (padrão: `"***"`)                             |
-
-
----
-
-## 📤 Saída
-
-Retorna uma `String` no padrão PIX Copia e Cola, já com o campo `6304XXXX` (CRC) calculado no final.
-
-Você pode usar essa string:
-- Como QR Code (com bibliotecas como `rqrcode`)
-- Copiar e colar diretamente em apps bancários
-
----
-
-## 🔧 Exemplo prático (via IRB)
-
-```bash
-$ bin/console
-```
+### ✏️ Alterar o valor de um payload existente
 
 ```ruby
-PixPayload::Generator.generate_payload(
-  chave: "email@pix.com",
-  nome: "Loja Exemplo",
-  cidade: "SAO PAULO",
-  valor: 99.90,
-  txid: "pedido123"
-)
+novo_payload = PixPayload::Modifier.alterar_valor(payload, 99.99)
+puts novo_payload
+```
+
+---
+
+### 🔎 Analisar um payload existente
+
+```ruby
+dados = PixPayload::Parser.parse_payload(payload)
+
+puts dados
+# {
+#   chave: "chave-pix@exemplo.com",
+#   nome: "Thierry Castro",
+#   cidade: "SAO PAULO",
+#   valor: 42.5,
+#   txid: "abc123",
+#   descricao: "Pagamento pelo serviço"
+# }
+```
+
+---
+
+## 🧰 Parâmetros aceitos
+
+| Parâmetro    | Tipo     | Obrigatório | Detalhes                                                        |
+|--------------|----------|-------------|-----------------------------------------------------------------|
+| `chave:`     | `String` | ✅          | Pode ser e-mail, CPF, CNPJ, telefone ou chave aleatória         |
+| `nome:`      | `String` | ✅          | Nome do recebedor (máx. 25 caracteres)                          |
+| `cidade:`    | `String` | ✅          | Cidade do recebedor (máx. 15 caracteres)                        |
+| `valor:`     | `Float`  | ❌          | Valor da cobrança (ex: `42.50`)                                 |
+| `txid:`      | `String` | ❌          | Identificador da transação. Padrão: `"***"`                     |
+| `descricao:` | `String` | ❌          | Descrição da cobrança (máx. 72 caracteres)                      |
+
+---
+
+## 💡 Curiosidade técnica
+
+O padrão do PIX Copia e Cola é baseado na estrutura **EMVCo**, que usa a seguinte lógica:
+
+```
+ID (2 dígitos) + TAMANHO (2 dígitos) + VALOR
+```
+
+Por exemplo:
+
+```text
+59 25 Thierry Barreto de Castro
+```
+
+Aqui:
+- `59` é o campo para **nome do recebedor**
+- `25` indica que o nome tem 25 caracteres
+- `Thierry Barreto de Castro` é o valor real
+
+Alguns campos contêm **subcampos** aninhados (ex: o campo `26`, que abriga a chave e a descrição).
+
+Você pode explorar mais IDs no [Manual do BR Code - BACEN (PDF)](https://www.bcb.gov.br/content/estabilidadefinanceira/spb_docs/ManualBRCode.pdf)
+
+---
+
+## 🛠️ Futuro CLI (em construção)
+
+Em breve, use via terminal:
+
+```bash
+pix_payload gerar --chave ... --valor 10 --nome ... --cidade ...
+pix_payload parse --payload "000201..."
+pix_payload alterar --payload "000201..." --valor 50
 ```
 
 ---
 
 ## ✅ Conformidade
 
-Este projeto segue o padrão **EMVCo** adotado pelo Banco Central do Brasil.
-Referência: [Manual do Padrão BR Code - BACEN (PDF)](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/Regulamento_Pix_ManualdePadroesparaIniciacaodoPix.pdf)
+Este projeto segue a especificação oficial do Banco Central do Brasil (EMVCo).
+
+📄 [Manual do Padrão BR Code - BACEN (PDF)](https://www.bcb.gov.br/content/estabilidadefinanceira/spb_docs/ManualBRCode.pdf)
 
 ---
-
 
 ## 📄 Licença
 
